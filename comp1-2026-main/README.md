@@ -72,8 +72,8 @@ O programa lê o arquivo Micro C informado, imprime os tokens reconhecidos e rep
 
 | Nome | Matrícula |
 |------|-----------|
-| _preencher_ | _preencher_ |
-| _preencher (se houver dupla)_ | _preencher_ |
+| Suelen Farias Paulino | 202519050060 |
+| João Pedro Pinheiro | 202519050044 |
 
 ## 🎓 Disciplina
 
