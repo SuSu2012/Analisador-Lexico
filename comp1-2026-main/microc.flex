@@ -141,9 +141,19 @@ ALFANUM     [a-zA-Z0-9_]
   * tabela hash caso queira ir alem do exigido. Nao esqueca de chamar
   * guarda_lexema() (ou equivalente) quando o token for de fato ID. */
 {LETRA}{ALFANUM}*   {
-                        /* TODO(aluno): reconhecer palavras reservadas aqui */
-                        guarda_lexema();
-                        return ID;
+                        if (strcmp(yytext, "main") == 0) return MAIN;
+                        else if (strcmp(yytext, "if") == 0) return IF;
+                        else if (strcmp(yytext, "else") == 0) return ELSE;
+                        else if (strcmp(yytext, "for") == 0) return FOR;
+                        else if (strcmp(yytext, "return") == 0) return RETURN;
+                        else if (strcmp(yytext, "int") == 0) return INT;
+                        else if (strcmp(yytext, "char") == 0) return CHAR;
+                        else if (strcmp(yytext, "print") == 0) return PRINT;
+                        else{
+                            /* TODO(aluno): reconhecer palavras reservadas aqui */
+                            guarda_lexema();
+                            return ID;
+                        }
                     }
 
  /* --- Constantes inteiras -----------------------------------------------
