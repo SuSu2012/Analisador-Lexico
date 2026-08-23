@@ -116,14 +116,16 @@ ALFANUM     [a-zA-Z0-9_]
   * Estes ja estao implementados como exemplo de uso de estados (%x) e
   * de tratamento de erro via EOF dentro de um estado especial. */
 "//".*              { /* comentario de linha: ignora ate o fim da linha */ }
-
-"/*"                { BEGIN(COMMENT); }
-<COMMENT>"*/"       { BEGIN(INITIAL); }
-<COMMENT>\n         { linha_atual++; }
-<COMMENT><<EOF>>    {
+ /* Por algum motivo não roda quando deixa esse comando
+    <COMMENT><<EOF>>    {
                         microc_yylval.error_msg = "EOF em comentario";
                         return UNDEF;
                     }
+ */
+"/*"                { BEGIN(COMMENT); }
+<COMMENT>"*/"       { BEGIN(INITIAL); }
+<COMMENT>\n         { linha_atual++; }
+
 <COMMENT>.          { /* consome qualquer outro caractere dentro do comentario */ }
 
  /* Fechamento de comentario sem abertura correspondente. */
@@ -150,7 +152,6 @@ ALFANUM     [a-zA-Z0-9_]
                         else if (strcmp(yytext, "char") == 0) return CHAR;
                         else if (strcmp(yytext, "print") == 0) return PRINT;
                         else{
-                            /* TODO(aluno): reconhecer palavras reservadas aqui */
                             guarda_lexema();
                             return ID;
                         }
@@ -172,7 +173,16 @@ ALFANUM     [a-zA-Z0-9_]
   * TODO(aluno): reconhecer o padrao 'x' (aspas simples, um caractere,
   * aspas simples) e devolver CHARCONST. Trate tambem o caso de erro em
   * que as aspas simples nao sao fechadas corretamente (token UNDEF). */
-
+ /* Aqui procura a aspa simples (\'), seguida por qualquer caracter (.) e termina com aspas (\') */
+\'.\'               {
+                        guarda_lexema();
+                        return CHARCONST;
+                    }
+ /* Aqui procura a aspa simples (\'), procura os carcteres ([]) exceto (^\n e ') os que estão na lista */
+\'[^'\n]*           {
+                        microc_yylval.error_msg = "Constante de caractere nao fechada";
+                        return UNDEF;
+                    }
 
  /* --- Constantes de string -------------------------------------------
   * TODO(aluno): reconhecer o padrao "[^"\n]*" (uma ou mais aspas
