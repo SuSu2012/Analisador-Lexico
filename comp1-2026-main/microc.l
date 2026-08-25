@@ -181,7 +181,7 @@ ALFANUM     [a-zA-Z0-9_]
   * do flex), pois o token UNDEF tambem vale 0 no enum TokenType -- se
   * dependessemos do comportamento padrao, um erro lexico seria
   * confundido com o fim do arquivo pelo main() de teste abaixo. */
-<<EOF>>             { return END_OF_FILE; }
+<INITIAL><<EOF>>             { return END_OF_FILE; }
 
  /* --- Espacos em branco e quebras de linha ---------------------------- */
 \n                  { linha_atual++; }
@@ -191,12 +191,11 @@ ALFANUM     [a-zA-Z0-9_]
   * Estes ja estao implementados como exemplo de uso de estados (%x) e
   * de tratamento de erro via EOF dentro de um estado especial. */
 "//".*              { /* comentario de linha: ignora ate o fim da linha */ }
- /* Por algum motivo não roda quando deixa esse comando
-    <COMMENT><<EOF>>    {
+<COMMENT><<EOF>>    {
                         microc_yylval.error_msg = "EOF em comentario";
+                        BEGIN(INITIAL);
                         return UNDEF;
                     }
- */
 "/*"                { BEGIN(COMMENT); }
 <COMMENT>"*/"       { BEGIN(INITIAL); }
 <COMMENT>\n         { linha_atual++; }
