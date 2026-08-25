@@ -78,12 +78,6 @@ YYSTYPE microc_yylval;
  * codigo "normal", dentro de comentarios ou dentro de strings). */
 int linha_atual = 1;
 
-/* Funcao auxiliar para preencher microc_yylval.symbol com uma copia do
- * texto reconhecido (yytext). Sinta-se livre para usar/adaptar. */
-static void guarda_lexema(void) {
-    microc_yylval.symbol = strdup(yytext);
-}
-
 /* funcoes para calcular hash usando o meotodo tradicional da miltiplicacao
 note que p é um numero arbitrário e tam é o tamanho da tabela hash que se deseja
 criar. Para melhor funcionamento, adotou-se p = 10 fixo e o tamanho da tabela muda.
@@ -130,7 +124,7 @@ NoIdentificador* busca_tabela_id(char *texto, int hash_pos){
     return NULL;
 }
 
-void inserir_tabela_id(int hash_pos) {
+NoIdentificador* inserir_tabela_id(int hash_pos) {
     NoIdentificador *ptr = identificadores[hash_pos];
     NoIdentificador *ptr_ant = NULL;
     NoIdentificador *novo = calloc(1, sizeof(NoIdentificador));
@@ -141,14 +135,29 @@ void inserir_tabela_id(int hash_pos) {
     if (ptr_ant == NULL) {
         identificadores[hash_pos] = novo;
     }
-    novo->identificador = strdup(microc_yylval.symbol);
+    novo->identificador = strdup(yytext);
     novo->proximo = NULL;
     if (ptr_ant != NULL){
         ptr_ant->proximo = novo;
     }
     ptr = novo;
+
+    return novo;
 }
 
+/* Funcao auxiliar para preencher microc_yylval.symbol com uma copia do
+ * texto reconhecido (yytext). Sinta-se livre para usar/adaptar. */
+static void guarda_lexema(void) {
+    unsigned long hash_val = retorna_hash(yytext, P);
+    unsigned int hash_pos = retorna_pos(hash_val, TAM);
+    NoIdentificador *novo = busca_tabela_id(yytext, hash_pos);
+    if (novo == NULL) {
+        novo = inserir_tabela_id(hash_pos);
+    }
+    if (novo != NULL) {
+        microc_yylval.symbol = novo->identificador;
+    }
+}
 %}
 
 /* -----------------------------------------------------------------------
