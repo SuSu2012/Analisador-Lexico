@@ -279,15 +279,14 @@ ALFANUM     [a-zA-Z0-9_]
   * longo -- veja a explicacao na Secao 2 do enunciado). */
 "=="                { return EQ; }
 "="                 { return ASSIGN; }
-
- /* TODO(aluno): complete os demais operadores que compartilham prefixo,
-  * seguindo o mesmo padrao do exemplo acima:
-  *   !=  e  !      ->  NEQ, NOT
-  *   <=  e  <      ->  LEQ, LT
-  *   >=  e  >      ->  GEQ, GT
-  *   &&             ->  AND
-  *   ||             ->  OR
-  */
+"!="                { return NEQ; }
+"!"                 { return NOT; }
+"<="                { return LEQ; }
+"<"                 { return LT; }
+">="                { return GEQ; }
+">"                 { return GT; }
+"&&"                { return AND; }
+"||"                { return OR; }
 
  /* --- Operadores aritmeticos e simbolos de pontuacao (ja prontos) ------ */
 "+"                 { return PLUS; }
