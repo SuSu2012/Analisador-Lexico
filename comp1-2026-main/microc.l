@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 /* ---------------------------------------------------------------------
  * 1. VOCABULARIO DE TOKENS (equivalente a tokens.h)
@@ -81,6 +82,71 @@ int linha_atual = 1;
  * texto reconhecido (yytext). Sinta-se livre para usar/adaptar. */
 static void guarda_lexema(void) {
     microc_yylval.symbol = strdup(yytext);
+}
+
+/* funcoes para calcular hash usando o meotodo tradicional da miltiplicacao
+note que p é um numero arbitrário e tam é o tamanho da tabela hash que se deseja
+criar. Para melhor funcionamento, adotou-se p = 10 fixo e o tamanho da tabela muda.
+tam = 256 para tabela de identificadores */
+
+#define P 10
+#define TAM 256
+
+unsigned long retorna_hash(char *texto, int p) {
+    double A = 0.6180339887; // [(raiz de 5) - 1]/2 aproximado
+    int x = 0;
+    char *ptr = texto;
+    double m;
+    while (*ptr != '\0'){
+        x = x + (*ptr);
+        ptr++;
+    }
+    m = pow(2, p);
+    return floor(m * (x * A - floor(x * A)));
+}
+
+unsigned int retorna_pos(unsigned long val, int tam){
+    return val % tam;
+}
+
+typedef struct NoIdentificador {
+    char *identificador;
+    struct NoIdentificador *proximo;
+} NoIdentificador;
+
+/* declaracao dos vetores para as tab hash */
+NoIdentificador *identificadores[TAM];
+
+NoIdentificador* busca_tabela_id(char *texto, int hash_pos){
+    NoIdentificador *ptr = identificadores[hash_pos];
+    int ind = 0;
+    while (ptr != NULL){
+        if (strcmp(texto, ptr->identificador) == 0) {
+            return ptr;
+        }
+        ptr = ptr->proximo;
+        ind++;
+    }
+    return NULL;
+}
+
+void inserir_tabela_id(int hash_pos) {
+    NoIdentificador *ptr = identificadores[hash_pos];
+    NoIdentificador *ptr_ant = NULL;
+    NoIdentificador *novo = calloc(1, sizeof(NoIdentificador));
+    while (ptr != NULL) {
+        ptr_ant = ptr;
+        ptr = ptr->proximo;
+    }
+    if (ptr_ant == NULL) {
+        identificadores[hash_pos] = novo;
+    }
+    novo->identificador = strdup(microc_yylval.symbol);
+    novo->proximo = NULL;
+    if (ptr_ant != NULL){
+        ptr_ant->proximo = novo;
+    }
+    ptr = novo;
 }
 
 %}
