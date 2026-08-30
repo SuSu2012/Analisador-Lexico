@@ -256,6 +256,10 @@ ALFANUM     [a-zA-Z0-9_]
                         guarda_lexema(yytext, INTEGERCONST);
                         return INTEGERCONST;
                     }
+-{DIGIT}+            {
+                        guarda_lexema(yytext, INTEGERCONST);
+                        return INTEGERCONST;
+                    }
 
  /* --- Constantes de caractere --------------------------------------------
   * TODO(aluno): reconhecer o padrao 'x' (aspas simples, um caractere,
@@ -303,6 +307,26 @@ ALFANUM     [a-zA-Z0-9_]
                         BEGIN(INITIAL);
                         clear_string_buffer();
                         return UNDEF;
+                    }
+
+<STRING>\\n         {
+                        buffer_string[pos_buffer++] = '\n';
+                    }
+
+<STRING>\\t         {
+                        buffer_string[pos_buffer++] = '\t';
+                    }
+
+<STRING>\\\"         {
+                        buffer_string[pos_buffer++] = '"';
+                    }
+
+<STRING>\\\\         {
+                        buffer_string[pos_buffer++] = '\\';
+                    }
+
+<STRING>\\0         {
+                        buffer_string[pos_buffer++] = '\0';
                     }
 
 <STRING>\n         {
