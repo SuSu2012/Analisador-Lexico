@@ -72,11 +72,22 @@ typedef struct {
 } YYSTYPE;
 
 YYSTYPE microc_yylval;
+#define TAM_BUFFER 1024
 
 /* Linha atual do arquivo-fonte sendo processado. Deve ser incrementada
  * toda vez que uma quebra de linha for consumida pelo scanner (seja em
  * codigo "normal", dentro de comentarios ou dentro de strings). */
 int linha_atual = 1;
+
+char buffer_string[TAM_BUFFER];
+int pos_buffer = 0;
+
+void clear_string_buffer() {
+    int i ;
+    for (i = 0; i < TAM_BUFFER - 1; i++){
+        buffer_string[i] = '\0';
+    }
+}
 
 /* funcoes para calcular hash usando o meotodo tradicional da miltiplicacao
 note que p é um numero arbitrário e tam é o tamanho da tabela hash que se deseja
@@ -105,17 +116,18 @@ unsigned int retorna_pos(unsigned long val, int tam){
 
 typedef struct NoIdentificador {
     char *identificador;
+    int tipo;
     struct NoIdentificador *proximo;
 } NoIdentificador;
 
 /* declaracao dos vetores para as tab hash */
 NoIdentificador *identificadores[TAM];
 
-NoIdentificador* busca_tabela_id(char *texto, int hash_pos){
+NoIdentificador* busca_tabela_id(char *texto, int tipo, int hash_pos){
     NoIdentificador *ptr = identificadores[hash_pos];
     int ind = 0;
     while (ptr != NULL){
-        if (strcmp(texto, ptr->identificador) == 0) {
+        if ((strcmp(texto, ptr->identificador) == 0) && ptr->tipo == tipo) {
             return ptr;
         }
         ptr = ptr->proximo;
@@ -124,7 +136,7 @@ NoIdentificador* busca_tabela_id(char *texto, int hash_pos){
     return NULL;
 }
 
-NoIdentificador* inserir_tabela_id(int hash_pos) {
+NoIdentificador* inserir_tabela_id(char *texto, int tipo, int hash_pos) {
     NoIdentificador *ptr = identificadores[hash_pos];
     NoIdentificador *ptr_ant = NULL;
     NoIdentificador *novo = calloc(1, sizeof(NoIdentificador));
@@ -135,7 +147,8 @@ NoIdentificador* inserir_tabela_id(int hash_pos) {
     if (ptr_ant == NULL) {
         identificadores[hash_pos] = novo;
     }
-    novo->identificador = strdup(yytext);
+    novo->identificador = strdup(texto);
+    novo->tipo = tipo;
     novo->proximo = NULL;
     if (ptr_ant != NULL){
         ptr_ant->proximo = novo;
@@ -147,12 +160,12 @@ NoIdentificador* inserir_tabela_id(int hash_pos) {
 
 /* Funcao auxiliar para preencher microc_yylval.symbol com uma copia do
  * texto reconhecido (yytext). Sinta-se livre para usar/adaptar. */
-static void guarda_lexema(void) {
-    unsigned long hash_val = retorna_hash(yytext, P);
+static void guarda_lexema(char *texto, int tipo) {
+    unsigned long hash_val = retorna_hash(texto, P);
     unsigned int hash_pos = retorna_pos(hash_val, TAM);
-    NoIdentificador *novo = busca_tabela_id(yytext, hash_pos);
+    NoIdentificador *novo = busca_tabela_id(texto, tipo, hash_pos);
     if (novo == NULL) {
-        novo = inserir_tabela_id(hash_pos);
+        novo = inserir_tabela_id(texto, tipo, hash_pos);
     }
     if (novo != NULL) {
         microc_yylval.symbol = novo->identificador;
@@ -169,6 +182,7 @@ LETRA       [a-zA-Z_]
 ALFANUM     [a-zA-Z0-9_]
 
 %x COMMENT
+%x STRING
 
 %%
 
@@ -226,7 +240,7 @@ ALFANUM     [a-zA-Z0-9_]
                         else if (strcmp(yytext, "char") == 0) return CHAR;
                         else if (strcmp(yytext, "print") == 0) return PRINT;
                         else{
-                            guarda_lexema();
+                            guarda_lexema(yytext, ID);
                             return ID;
                         }
                     }
@@ -239,7 +253,7 @@ ALFANUM     [a-zA-Z0-9_]
   * abaixo) para decidir quando um '-' faz parte do numero e quando ele
   * e, na verdade, o operador de subtracao. */
 {DIGIT}+            {
-                        guarda_lexema();
+                        guarda_lexema(yytext, INTEGERCONST);
                         return INTEGERCONST;
                     }
 
@@ -249,7 +263,7 @@ ALFANUM     [a-zA-Z0-9_]
   * que as aspas simples nao sao fechadas corretamente (token UNDEF). */
  /* Aqui procura a aspa simples (\'), seguida por qualquer caracter (.) e termina com aspas (\') */
 \'.\'               {
-                        guarda_lexema();
+                        guarda_lexema(yytext, CHARCONST);
                         return CHARCONST;
                     }
  /* Aqui procura a aspa simples (\'), procura os carcteres ([]) exceto (^\n e ') os que estão na lista */
@@ -269,6 +283,44 @@ ALFANUM     [a-zA-Z0-9_]
   *     ("String contem caractere nulo")
   * Alem disso, converta as sequencias de escape (\n, \t, \\, \", \0)
   * para os caracteres correspondentes antes de armazenar o lexema. */
+
+
+\"                  {
+                        BEGIN(STRING);
+                        pos_buffer = 0;
+                    }
+
+<STRING>\"          { 
+                        BEGIN(INITIAL);
+                        buffer_string[pos_buffer] = '\0';
+                        guarda_lexema(buffer_string, STRINGCONST);
+                        clear_string_buffer();
+                        return STRINGCONST;
+                    }
+
+<STRING><<EOF>>     {
+                        microc_yylval.error_msg = "EOF em string";
+                        BEGIN(INITIAL);
+                        clear_string_buffer();
+                        return UNDEF;
+                    }
+
+<STRING>\n         {
+                        microc_yylval.error_msg = "String nao terminada";
+                        BEGIN(INITIAL);
+                        clear_string_buffer();
+                        linha_atual++;
+                        return UNDEF;
+                    }
+<STRING>\0         {
+                        microc_yylval.error_msg = "String contem caractere nulo";
+                        BEGIN(INITIAL);
+                        clear_string_buffer();
+                        return UNDEF;
+                    }         
+<STRING>.           {
+                        buffer_string[pos_buffer++] = yytext[0];
+                    }
 
 
  /* --- Operadores relacionais e logicos ---------------------------------
