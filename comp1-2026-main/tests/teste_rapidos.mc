@@ -22,3 +22,19 @@ char char_valido;
 // 4. Testando constantes de caractere com ERRO (nao fechadas)
 'x
 '
+
+// Constantes de Caractere (CHARCONST)
+char c1 = 'a';
+char c2 = '\n';
+char c3 = '\t';
+char c4 = '\\';
+char c5 = '\'';
+
+// Erro de caractere nao fechado
+char err1 = 'x;
+
+// Subtracao vs Inteiros (MINUS / INTEGERCONST)
+int x = 5;
+int y = x - 2;
+int z = a-10;
+int w = -30;

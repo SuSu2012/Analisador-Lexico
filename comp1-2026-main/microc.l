@@ -256,10 +256,6 @@ ALFANUM     [a-zA-Z0-9_]
                         guarda_lexema(yytext, INTEGERCONST);
                         return INTEGERCONST;
                     }
--{DIGIT}+            {
-                        guarda_lexema(yytext, INTEGERCONST);
-                        return INTEGERCONST;
-                    }
 
  /* --- Constantes de caractere --------------------------------------------
   * TODO(aluno): reconhecer o padrao 'x' (aspas simples, um caractere,
@@ -275,6 +271,25 @@ ALFANUM     [a-zA-Z0-9_]
                         microc_yylval.error_msg = "Constante de caractere nao fechada";
                         return UNDEF;
                     }
+ /* Aqui constante de carctere valida com suporte e escape */
+\'([^\'\\\n]|\\.)\' {
+    char res[2] = {0, 0};
+    unsigned char c2 = (unsigned char) yytext[2];
+
+    if (yytext[1] == '\\') {
+        if (c2 == 110)      res[0] = 10;   /* letra n vira newline */
+        else if (c2 == 116) res[0] = 9;    /* letra t vira tab */
+        else if (c2 == 92)  res[0] = 92;   /* barra invertida */
+        else if (c2 == 39)  res[0] = 39;   /* aspa simples */
+        else if (c2 == 48)  res[0] = 0;    /* zero vira nulo */
+        else                res[0] = c2;
+    } else {
+        res[0] = yytext[1];
+    }
+
+    guarda_lexema(res, CHARCONST);
+    return CHARCONST;
+}
 
  /* --- Constantes de string -------------------------------------------
   * TODO(aluno): reconhecer o padrao "[^"\n]*" (uma ou mais aspas
