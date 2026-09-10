@@ -89,6 +89,13 @@ void clear_string_buffer() {
     }
 }
 
+ /* insere caracteres no buffer verificando o limite de tamanho */
+void add_char_string(char c) {
+    if (pos_buffer < TAM_BUFFER - 1) {
+        buffer_string[pos_buffer++] = c;
+    }
+}
+
 /* funcoes para calcular hash usando o meotodo tradicional da miltiplicacao
 note que p é um numero arbitrário e tam é o tamanho da tabela hash que se deseja
 criar. Para melhor funcionamento, adotou-se p = 10 fixo e o tamanho da tabela muda.
@@ -303,63 +310,50 @@ ALFANUM     [a-zA-Z0-9_]
   * Alem disso, converta as sequencias de escape (\n, \t, \\, \", \0)
   * para os caracteres correspondentes antes de armazenar o lexema. */
 
+\" {
+    BEGIN(STRING);
+    pos_buffer = 0;
+    buffer_string[0] = '\0';
+    yymore();
+}
 
-\"                  {
-                        BEGIN(STRING);
-                        pos_buffer = 0;
-                    }
+<STRING>\" { 
+    BEGIN(INITIAL);
+    buffer_string[pos_buffer] = '\0';
+    strcpy(yytext, buffer_string); /* Sobrescreve o yytext expandido com o buffer processado */
+    guarda_lexema(buffer_string, STRINGCONST);
+    return STRINGCONST;
+}
 
-<STRING>\"          { 
-                        BEGIN(INITIAL);
-                        buffer_string[pos_buffer] = '\0';
-                        guarda_lexema(buffer_string, STRINGCONST);
-                        clear_string_buffer();
-                        return STRINGCONST;
-                    }
+<STRING>\\n  { add_char_string('\n'); yymore(); }
+<STRING>\\t  { add_char_string('\t'); yymore(); }
+<STRING>\\\" { add_char_string('"');  yymore(); }
+<STRING>\\\\ { add_char_string('\\'); yymore(); }
+<STRING>\\0  { add_char_string('\0'); yymore(); }
 
-<STRING><<EOF>>     {
-                        microc_yylval.error_msg = "EOF em string";
-                        BEGIN(INITIAL);
-                        clear_string_buffer();
-                        return UNDEF;
-                    }
+<STRING>\n {
+    microc_yylval.error_msg = "String nao terminada";
+    BEGIN(INITIAL);
+    linha_atual++;
+    return UNDEF;
+}
 
-<STRING>\\n         {
-                        buffer_string[pos_buffer++] = '\n';
-                    }
+<STRING>\0 {
+    microc_yylval.error_msg = "String contem caractere nulo";
+    BEGIN(INITIAL);
+    return UNDEF;
+}
 
-<STRING>\\t         {
-                        buffer_string[pos_buffer++] = '\t';
-                    }
+<STRING><<EOF>> {
+    microc_yylval.error_msg = "EOF em string";
+    BEGIN(INITIAL);
+    return UNDEF;
+}
 
-<STRING>\\\"         {
-                        buffer_string[pos_buffer++] = '"';
-                    }
-
-<STRING>\\\\         {
-                        buffer_string[pos_buffer++] = '\\';
-                    }
-
-<STRING>\\0         {
-                        buffer_string[pos_buffer++] = '\0';
-                    }
-
-<STRING>\n         {
-                        microc_yylval.error_msg = "String nao terminada";
-                        BEGIN(INITIAL);
-                        clear_string_buffer();
-                        linha_atual++;
-                        return UNDEF;
-                    }
-<STRING>\0         {
-                        microc_yylval.error_msg = "String contem caractere nulo";
-                        BEGIN(INITIAL);
-                        clear_string_buffer();
-                        return UNDEF;
-                    }         
-<STRING>.           {
-                        buffer_string[pos_buffer++] = yytext[0];
-                    }
+<STRING>. { 
+    add_char_string(yytext[yyleng - 1]); /* Captura o caractere atual no buffer */
+    yymore(); 
+}
 
 
  /* --- Operadores relacionais e logicos ---------------------------------

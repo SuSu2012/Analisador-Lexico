@@ -38,5 +38,89 @@ Token: tipo = SEMICOLON     lexema = ';'  linha = 15
 Token: tipo = CHARCONST     lexema = ''a''  linha = 18
 Token: tipo = CHARCONST     lexema = ''1''  linha = 19
 Token: tipo = CHARCONST     lexema = ''+''  linha = 20
-ERRO LEXICO (linha 23): (null)
-ERRO LEXICO (linha 24): (null)
+ERRO LEXICO (linha 23): Constante de caractere nao fechada
+ERRO LEXICO (linha 24): Constante de caractere nao fechada
+Token: tipo = CHAR          lexema = 'char'  linha = 27
+Token: tipo = ID            lexema = 'c1'  linha = 27
+Token: tipo = ASSIGN        lexema = '='  linha = 27
+Token: tipo = CHARCONST     lexema = ''a''  linha = 27
+Token: tipo = SEMICOLON     lexema = ';'  linha = 27
+Token: tipo = CHAR          lexema = 'char'  linha = 28
+Token: tipo = ID            lexema = 'c2'  linha = 28
+Token: tipo = ASSIGN        lexema = '='  linha = 28
+Token: tipo = CHARCONST     lexema = ''\n''  linha = 28
+Token: tipo = SEMICOLON     lexema = ';'  linha = 28
+Token: tipo = CHAR          lexema = 'char'  linha = 29
+Token: tipo = ID            lexema = 'c3'  linha = 29
+Token: tipo = ASSIGN        lexema = '='  linha = 29
+Token: tipo = CHARCONST     lexema = ''\t''  linha = 29
+Token: tipo = SEMICOLON     lexema = ';'  linha = 29
+Token: tipo = CHAR          lexema = 'char'  linha = 30
+Token: tipo = ID            lexema = 'c4'  linha = 30
+Token: tipo = ASSIGN        lexema = '='  linha = 30
+Token: tipo = CHARCONST     lexema = ''\\''  linha = 30
+Token: tipo = SEMICOLON     lexema = ';'  linha = 30
+Token: tipo = CHAR          lexema = 'char'  linha = 31
+Token: tipo = ID            lexema = 'c5'  linha = 31
+Token: tipo = ASSIGN        lexema = '='  linha = 31
+Token: tipo = CHARCONST     lexema = ''\'''  linha = 31
+Token: tipo = SEMICOLON     lexema = ';'  linha = 31
+Token: tipo = CHAR          lexema = 'char'  linha = 34
+Token: tipo = ID            lexema = 'err1'  linha = 34
+Token: tipo = ASSIGN        lexema = '='  linha = 34
+ERRO LEXICO (linha 34): Constante de caractere nao fechada
+Token: tipo = INT           lexema = 'int'  linha = 37
+Token: tipo = ID            lexema = 'x'  linha = 37
+Token: tipo = ASSIGN        lexema = '='  linha = 37
+Token: tipo = INTEGERCONST  lexema = '5'  linha = 37
+Token: tipo = SEMICOLON     lexema = ';'  linha = 37
+Token: tipo = INT           lexema = 'int'  linha = 38
+Token: tipo = ID            lexema = 'y'  linha = 38
+Token: tipo = ASSIGN        lexema = '='  linha = 38
+Token: tipo = ID            lexema = 'x'  linha = 38
+Token: tipo = MINUS         lexema = '-'  linha = 38
+Token: tipo = INTEGERCONST  lexema = '2'  linha = 38
+Token: tipo = SEMICOLON     lexema = ';'  linha = 38
+Token: tipo = INT           lexema = 'int'  linha = 39
+Token: tipo = ID            lexema = 'z'  linha = 39
+Token: tipo = ASSIGN        lexema = '='  linha = 39
+Token: tipo = ID            lexema = 'a'  linha = 39
+Token: tipo = MINUS         lexema = '-'  linha = 39
+Token: tipo = INTEGERCONST  lexema = '10'  linha = 39
+Token: tipo = SEMICOLON     lexema = ';'  linha = 39
+Token: tipo = INT           lexema = 'int'  linha = 40
+Token: tipo = ID            lexema = 'w'  linha = 40
+Token: tipo = ASSIGN        lexema = '='  linha = 40
+Token: tipo = MINUS         lexema = '-'  linha = 40
+Token: tipo = INTEGERCONST  lexema = '30'  linha = 40
+Token: tipo = SEMICOLON     lexema = ';'  linha = 40
+Token: tipo = ID            lexema = 'string'  linha = 45
+Token: tipo = ID            lexema = 's1'  linha = 45
+Token: tipo = ASSIGN        lexema = '='  linha = 45
+Token: tipo = STRINGCONST   lexema = 'Texto simples'  linha = 45
+Token: tipo = SEMICOLON     lexema = ';'  linha = 45
+Token: tipo = ID            lexema = 'string'  linha = 46
+Token: tipo = ID            lexema = 's2'  linha = 46
+Token: tipo = ASSIGN        lexema = '='  linha = 46
+Token: tipo = STRINGCONST   lexema = ''  linha = 46
+Token: tipo = SEMICOLON     lexema = ';'  linha = 46
+Token: tipo = ID            lexema = 'string'  linha = 47
+Token: tipo = ID            lexema = 's3'  linha = 47
+Token: tipo = ASSIGN        lexema = '='  linha = 47
+Token: tipo = STRINGCONST   lexema = 'Com "aspas", \barra\,      tab e
+ nova linha'  linha = 47
+Token: tipo = SEMICOLON     lexema = ';'  linha = 47
+Token: tipo = ID            lexema = 'string'  linha = 50
+Token: tipo = ID            lexema = 'err_str1'  linha = 50
+Token: tipo = ASSIGN        lexema = '='  linha = 50
+ERRO LEXICO (linha 51): String nao terminada
+Token: tipo = INT           lexema = 'int'  linha = 51
+Token: tipo = ID            lexema = 'proxima_linha'  linha = 51
+Token: tipo = ASSIGN        lexema = '='  linha = 51
+Token: tipo = INTEGERCONST  lexema = '10'  linha = 51
+Token: tipo = SEMICOLON     lexema = ';'  linha = 51
+Token: tipo = ID            lexema = 'string'  linha = 54
+Token: tipo = ID            lexema = 'long_str'  linha = 54
+Token: tipo = ASSIGN        lexema = '='  linha = 54
+Token: tipo = STRINGCONST   lexema = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'  linha = 54
+Token: tipo = SEMICOLON     lexema = ';'  linha = 54

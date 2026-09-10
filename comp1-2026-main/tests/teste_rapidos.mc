@@ -38,3 +38,17 @@ int x = 5;
 int y = x - 2;
 int z = a-10;
 int w = -30;
+
+// Constantes de String (STRINGCONST)
+
+// 1. Strings validas (comum, vazia e com escapes)
+string s1 = "Texto simples";
+string s2 = "";
+string s3 = "Com \"aspas\", \\barra\\, \t tab e \n nova linha";
+
+// 2. Erro: String nao terminada (quebra de linha sem escape)
+string err_str1 = "String sem fechar
+int proxima_linha = 10;
+
+// 3. Teste de String Longa (verifica protecao de buffer)
+string long_str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
