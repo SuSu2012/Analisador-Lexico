@@ -30,7 +30,7 @@ O enunciado completo do trabalho está disponível em [`TP1_Analise_Lexica_Micro
 
 ```
 comp1-2026/
-├── microc.flex                    # Especificação léxica (arquivo principal a editar)
+├── microc.l                       # Especificação léxica (arquivo principal a editar)
 ├── tests/                         # Programas de exemplo em Micro C usados como entrada de teste
 ├── TP1_Analise_Lexica_MicroC.pdf  # Enunciado do trabalho
 ├── leiame.txt                     # Instruções originais do professor
@@ -52,7 +52,7 @@ comp1-2026/
 No diretório do projeto, execute:
 
 ```bash
-flex microc.flex
+flex microc.l
 gcc lex.yy.c -o lexer
 ```
 
