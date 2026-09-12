@@ -83,7 +83,7 @@ Token: tipo = RPAREN        lexema = ')'  linha = 34
 Token: tipo = LBRACE        lexema = '{'  linha = 34
 Token: tipo = PRINT         lexema = 'print'  linha = 35
 Token: tipo = LPAREN        lexema = '('  linha = 35
-Token: tipo = STRINGCONST   lexema = 'Resultado grande'  linha = 35
+Token: tipo = STRINGCONST   lexema = '"'  linha = 35
 Token: tipo = RPAREN        lexema = ')'  linha = 35
 Token: tipo = SEMICOLON     lexema = ';'  linha = 35
 Token: tipo = RBRACE        lexema = '}'  linha = 36
@@ -91,7 +91,7 @@ Token: tipo = ELSE          lexema = 'else'  linha = 36
 Token: tipo = LBRACE        lexema = '{'  linha = 36
 Token: tipo = PRINT         lexema = 'print'  linha = 37
 Token: tipo = LPAREN        lexema = '('  linha = 37
-Token: tipo = STRINGCONST   lexema = 'Resultado pequeno'  linha = 37
+Token: tipo = STRINGCONST   lexema = '"'  linha = 37
 Token: tipo = RPAREN        lexema = ')'  linha = 37
 Token: tipo = SEMICOLON     lexema = ';'  linha = 37
 Token: tipo = RBRACE        lexema = '}'  linha = 38
@@ -126,7 +126,7 @@ Token: tipo = RPAREN        lexema = ')'  linha = 45
 Token: tipo = LBRACE        lexema = '{'  linha = 45
 Token: tipo = PRINT         lexema = 'print'  linha = 46
 Token: tipo = LPAREN        lexema = '('  linha = 46
-Token: tipo = STRINGCONST   lexema = 'x e nao-negativo e y e diferente de zero'  linha = 46
+Token: tipo = STRINGCONST   lexema = '"'  linha = 46
 Token: tipo = RPAREN        lexema = ')'  linha = 46
 Token: tipo = SEMICOLON     lexema = ';'  linha = 46
 Token: tipo = RBRACE        lexema = '}'  linha = 47
@@ -143,7 +143,7 @@ Token: tipo = RPAREN        lexema = ')'  linha = 49
 Token: tipo = LBRACE        lexema = '{'  linha = 49
 Token: tipo = PRINT         lexema = 'print'  linha = 50
 Token: tipo = LPAREN        lexema = '('  linha = 50
-Token: tipo = STRINGCONST   lexema = 'condicao ou satisfeita'  linha = 50
+Token: tipo = STRINGCONST   lexema = '"'  linha = 50
 Token: tipo = RPAREN        lexema = ')'  linha = 50
 Token: tipo = SEMICOLON     lexema = ';'  linha = 50
 Token: tipo = RBRACE        lexema = '}'  linha = 51
@@ -159,7 +159,7 @@ Token: tipo = RPAREN        lexema = ')'  linha = 53
 Token: tipo = LBRACE        lexema = '{'  linha = 53
 Token: tipo = PRINT         lexema = 'print'  linha = 54
 Token: tipo = LPAREN        lexema = '('  linha = 54
-Token: tipo = STRINGCONST   lexema = 'x nao e negativo'  linha = 54
+Token: tipo = STRINGCONST   lexema = '"'  linha = 54
 Token: tipo = RPAREN        lexema = ')'  linha = 54
 Token: tipo = SEMICOLON     lexema = ';'  linha = 54
 Token: tipo = RBRACE        lexema = '}'  linha = 55
