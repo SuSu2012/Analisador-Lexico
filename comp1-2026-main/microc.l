@@ -73,6 +73,7 @@ typedef struct {
 
 YYSTYPE microc_yylval;
 #define TAM_BUFFER 1024
+int termina_expr = 0; // variável usada para tratar ambiguidade dos inteiros negativos
 
 /* Linha atual do arquivo-fonte sendo processado. Deve ser incrementada
  * toda vez que uma quebra de linha for consumida pelo scanner (seja em
@@ -89,7 +90,6 @@ void clear_string_buffer() {
     }
 }
 
- /* insere caracteres no buffer verificando o limite de tamanho */
 void add_char_string(char c) {
     if (pos_buffer < TAM_BUFFER - 1) {
         buffer_string[pos_buffer++] = c;
@@ -238,16 +238,17 @@ ALFANUM     [a-zA-Z0-9_]
   * tabela hash caso queira ir alem do exigido. Nao esqueca de chamar
   * guarda_lexema() (ou equivalente) quando o token for de fato ID. */
 {LETRA}{ALFANUM}*   {
-                        if (strcmp(yytext, "main") == 0) return MAIN;
-                        else if (strcmp(yytext, "if") == 0) return IF;
-                        else if (strcmp(yytext, "else") == 0) return ELSE;
-                        else if (strcmp(yytext, "for") == 0) return FOR;
-                        else if (strcmp(yytext, "return") == 0) return RETURN;
-                        else if (strcmp(yytext, "int") == 0) return INT;
-                        else if (strcmp(yytext, "char") == 0) return CHAR;
-                        else if (strcmp(yytext, "print") == 0) return PRINT;
+                        if (strcmp(yytext, "main") == 0) {termina_expr = 0; return MAIN;}
+                        else if (strcmp(yytext, "if") == 0) {termina_expr = 0; return IF;}
+                        else if (strcmp(yytext, "else") == 0) {termina_expr = 0; return ELSE;}
+                        else if (strcmp(yytext, "for") == 0) {termina_expr = 0; return FOR;}
+                        else if (strcmp(yytext, "return") == 0) {termina_expr = 0; return RETURN;}
+                        else if (strcmp(yytext, "int") == 0) {termina_expr = 0; return INT;}
+                        else if (strcmp(yytext, "char") == 0) {termina_expr = 0; return CHAR;}
+                        else if (strcmp(yytext, "print") == 0) {termina_expr = 0; return PRINT;}
                         else{
                             guarda_lexema(yytext, ID);
+                            termina_expr = 1;
                             return ID;
                         }
                     }
@@ -261,7 +262,19 @@ ALFANUM     [a-zA-Z0-9_]
   * e, na verdade, o operador de subtracao. */
 {DIGIT}+            {
                         guarda_lexema(yytext, INTEGERCONST);
+                        termina_expr = 1;
                         return INTEGERCONST;
+                    }
+-{DIGIT}+           {
+                        if (termina_expr) {
+                            yyless(1);
+                            termina_expr = 0;
+                            return MINUS;
+                        } else {
+                            guarda_lexema(yytext, INTEGERCONST);
+                            termina_expr = 1;
+                            return INTEGERCONST;
+                        }
                     }
 
  /* --- Constantes de caractere --------------------------------------------
@@ -270,7 +283,9 @@ ALFANUM     [a-zA-Z0-9_]
   * que as aspas simples nao sao fechadas corretamente (token UNDEF). */
  /* Aqui procura a aspa simples (\'), seguida por qualquer caracter (.) e termina com aspas (\') */
 \'.\'               {
-                        guarda_lexema(yytext, CHARCONST);
+                        char res[2] = {yytext[1], '\0'}; // trata o CHARCONST como string para poder armazenar sem as aspas
+                        guarda_lexema(res, CHARCONST);
+                        termina_expr = 1;
                         return CHARCONST;
                     }
  /* Aqui procura a aspa simples (\'), procura os carcteres ([]) exceto (^\n e ') os que estão na lista */
@@ -278,7 +293,7 @@ ALFANUM     [a-zA-Z0-9_]
                         microc_yylval.error_msg = "Constante de caractere nao fechada";
                         return UNDEF;
                     }
- /* Aqui constante de carctere valida com suporte e escape */
+ /* Aqui constante de caractere valida com suporte e escape */
 \'([^\'\\\n]|\\.)\' {
     char res[2] = {0, 0};
     unsigned char c2 = (unsigned char) yytext[2];
@@ -295,6 +310,7 @@ ALFANUM     [a-zA-Z0-9_]
     }
 
     guarda_lexema(res, CHARCONST);
+    termina_expr = 1;
     return CHARCONST;
 }
 
@@ -314,22 +330,21 @@ ALFANUM     [a-zA-Z0-9_]
     BEGIN(STRING);
     pos_buffer = 0;
     buffer_string[0] = '\0';
-    yymore();
 }
 
 <STRING>\" { 
     BEGIN(INITIAL);
     buffer_string[pos_buffer] = '\0';
-    strcpy(yytext, buffer_string); /* Sobrescreve o yytext expandido com o buffer processado */
     guarda_lexema(buffer_string, STRINGCONST);
+    termina_expr = 1;
     return STRINGCONST;
 }
 
-<STRING>\\n  { add_char_string('\n'); yymore(); }
-<STRING>\\t  { add_char_string('\t'); yymore(); }
-<STRING>\\\" { add_char_string('"');  yymore(); }
-<STRING>\\\\ { add_char_string('\\'); yymore(); }
-<STRING>\\0  { add_char_string('\0'); yymore(); }
+<STRING>\\n  { add_char_string('\n'); }
+<STRING>\\t  { add_char_string('\t'); }
+<STRING>\\\" { add_char_string('"'); }
+<STRING>\\\\ { add_char_string('\\'); }
+<STRING>\\0  { add_char_string('\0'); }
 
 <STRING>\n {
     microc_yylval.error_msg = "String nao terminada";
@@ -351,8 +366,7 @@ ALFANUM     [a-zA-Z0-9_]
 }
 
 <STRING>. { 
-    add_char_string(yytext[yyleng - 1]); /* Captura o caractere atual no buffer */
-    yymore(); 
+    add_char_string(yytext[0]);
 }
 
 
@@ -362,31 +376,31 @@ ALFANUM     [a-zA-Z0-9_]
   * de forma mais simples em flex, escrever as duas alternativas como
   * regras separadas, deixando o proprio flex escolher o casamento mais
   * longo -- veja a explicacao na Secao 2 do enunciado). */
-"=="                { return EQ; }
-"="                 { return ASSIGN; }
-"!="                { return NEQ; }
-"!"                 { return NOT; }
-"<="                { return LEQ; }
-"<"                 { return LT; }
-">="                { return GEQ; }
-">"                 { return GT; }
-"&&"                { return AND; }
-"||"                { return OR; }
+"=="                { termina_expr = 0; return EQ; }
+"="                 { termina_expr = 0; return ASSIGN; }
+"!="                { termina_expr = 0; return NEQ; }
+"!"                 { termina_expr = 0; return NOT; }
+"<="                { termina_expr = 0; return LEQ; }
+"<"                 { termina_expr = 0; return LT; }
+">="                { termina_expr = 0; return GEQ; }
+">"                 { termina_expr = 0; return GT; }
+"&&"                { termina_expr = 0; return AND; }
+"||"                { termina_expr = 0; return OR; }
 
  /* --- Operadores aritmeticos e simbolos de pontuacao (ja prontos) ------ */
-"+"                 { return PLUS; }
-"-"                 { return MINUS; }
-"*"                 { return MUL; }
-"/"                 { return DIV; }
-"%"                 { return MOD; }
-";"                 { return SEMICOLON; }
-","                 { return COMMA; }
-"("                 { return LPAREN; }
-")"                 { return RPAREN; }
+"+"                 { termina_expr = 0; return PLUS; }
+"-"                 { termina_expr = 0; return MINUS; }
+"*"                 { termina_expr = 0; return MUL; }
+"/"                 { termina_expr = 0; return DIV; }
+"%"                 { termina_expr = 0; return MOD; }
+";"                 { termina_expr = 0; return SEMICOLON; }
+","                 { termina_expr = 0; return COMMA; }
+"("                 { termina_expr = 0; return LPAREN; }
+")"                 { termina_expr = 1; return RPAREN; }
 "{"                 { return LBRACE; }
 "}"                 { return RBRACE; }
-"["                 { return LBRACKET; }
-"]"                 { return RBRACKET; }
+"["                 { termina_expr = 0; return LBRACKET; }
+"]"                 { termina_expr = 1; return RBRACKET; }
 
  /* --- Caractere invalido -------------------------------------------------
   * Casa com qualquer caractere que nao tenha correspondido a nenhuma
