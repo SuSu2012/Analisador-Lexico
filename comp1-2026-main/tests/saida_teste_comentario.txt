@@ -1,0 +1,6 @@
+Token: tipo = INT           lexema = 'int'  linha = 1
+Token: tipo = ID            lexema = 'x'  linha = 1
+Token: tipo = ASSIGN        lexema = '='  linha = 1
+Token: tipo = INTEGERCONST  lexema = '1'  linha = 1
+Token: tipo = SEMICOLON     lexema = ';'  linha = 1
+ERRO LEXICO (linha 2): EOF em comentario
